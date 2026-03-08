@@ -15,6 +15,7 @@ class CatalogResponse(BaseModel):
     name: str
     description: str | None = None
     isPublic: bool
+    movieIds: list[str] = Field(default_factory=list)
     createdAt: datetime
     updatedAt: datetime
 

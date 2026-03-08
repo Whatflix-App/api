@@ -42,6 +42,7 @@ class AuthService:
         apple_identity = verify_apple_identity(payload.identityToken, payload.authorizationCode)
         user = self.repo.find_user_by_apple_sub(apple_identity.sub)
         is_new_user = False
+        full_name = payload.fullName.strip() if isinstance(payload.fullName, str) and payload.fullName.strip() else None
 
         if user is None:
             is_new_user = True
@@ -50,9 +51,13 @@ class AuthService:
                 user_id=_user_id(),
                 email=apple_identity.email,
                 display_name=apple_identity.display_name,
+                full_name=full_name,
                 apple_sub=apple_identity.sub,
                 created_at=now,
             )
+        elif full_name and not user.full_name:
+            user.full_name = full_name
+            self.db.add(user)
 
         return self._issue_auth_response(
             user_id=user.id,

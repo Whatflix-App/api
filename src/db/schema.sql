@@ -2,9 +2,13 @@ CREATE TABLE IF NOT EXISTS users (
   id VARCHAR(64) PRIMARY KEY,
   email VARCHAR(255) UNIQUE,
   display_name VARCHAR(120),
+  full_name VARCHAR(120),
   apple_sub VARCHAR(255) UNIQUE NOT NULL,
   created_at TIMESTAMPTZ NOT NULL
 );
+
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS full_name VARCHAR(120);
 
 CREATE TABLE IF NOT EXISTS sessions (
   id VARCHAR(64) PRIMARY KEY,
@@ -53,3 +57,35 @@ CREATE TABLE IF NOT EXISTS catalog_items (
 
 CREATE INDEX IF NOT EXISTS idx_catalogs_owner ON catalogs(owner_user_id);
 CREATE INDEX IF NOT EXISTS idx_catalog_items_catalog ON catalog_items(catalog_id);
+
+CREATE TABLE IF NOT EXISTS history (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64) REFERENCES users(id) ON DELETE SET NULL,
+  scheme VARCHAR(64) NOT NULL,
+  route VARCHAR(255) NOT NULL,
+  method VARCHAR(10),
+  source VARCHAR(32) NOT NULL DEFAULT 'manual',
+  rationale TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_history_user_created
+  ON history(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_history_scheme_route
+  ON history(scheme, route);
+
+CREATE TABLE IF NOT EXISTS watch_history (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id VARCHAR(64) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  movie_id VARCHAR(64) NOT NULL,
+  watched_at TIMESTAMPTZ NOT NULL,
+  completed BOOLEAN NOT NULL DEFAULT FALSE,
+  progress_pct SMALLINT NOT NULL DEFAULT 0,
+  source VARCHAR(32) NOT NULL DEFAULT 'manual',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_watch_history_user_watched
+  ON watch_history(user_id, watched_at DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_watch_history_user_movie
+  ON watch_history(user_id, movie_id);

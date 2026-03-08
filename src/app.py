@@ -3,7 +3,9 @@ from fastapi import FastAPI
 from src.middleware.error_middleware import attach_error_handlers
 from src.modules.auth.auth_controller import router as auth_router
 from src.modules.catalogs.catalogs_controller import router as catalogs_router
+from src.modules.history.history_controller import router as history_router
 from src.modules.profile.profile_controller import router as profile_router
+from src.modules.search.search_controller import router as search_router
 from src.modules.watchlist.watchlist_controller import router as watchlist_router
 
 
@@ -14,6 +16,8 @@ def create_app() -> FastAPI:
     app.include_router(profile_router)
     app.include_router(watchlist_router)
     app.include_router(catalogs_router)
+    app.include_router(history_router)
+    app.include_router(search_router)
 
     @app.get("/health")
     def health() -> dict:

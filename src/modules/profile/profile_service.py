@@ -20,7 +20,12 @@ class ProfileService:
                 status_code=404,
             )
 
-        return ProfileResponse(id=user.id, email=user.email, displayName=user.display_name)
+        return ProfileResponse(
+            id=user.id,
+            email=user.email,
+            displayName=user.display_name,
+            fullName=user.full_name,
+        )
 
     def update_profile(self, user_id: str, payload: UpdateProfileRequest) -> ProfileResponse:
         user = self.repo.find_user_by_id(user_id)
@@ -34,4 +39,9 @@ class ProfileService:
 
         updated = self.repo.update_user_display_name(user, payload.displayName)
         self.db.commit()
-        return ProfileResponse(id=updated.id, email=updated.email, displayName=updated.display_name)
+        return ProfileResponse(
+            id=updated.id,
+            email=updated.email,
+            displayName=updated.display_name,
+            fullName=updated.full_name,
+        )

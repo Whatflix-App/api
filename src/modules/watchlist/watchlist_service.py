@@ -1,3 +1,5 @@
+from sqlalchemy import select
+
 from src.db.models import WatchlistItem
 from src.modules.auth.auth_repo import AuthRepo
 from src.modules.watchlist.watchlist_types import (
@@ -49,6 +51,33 @@ class WatchlistService:
             notes=item.notes,
             priority=item.priority,
         )
+
+    def list_items(self, user_id: str) -> list[WatchlistItemResponse]:
+        user = self.auth_repo.find_user_by_id(user_id)
+        if user is None:
+            raise AppError(
+                code="USER_NOT_FOUND",
+                message="User was not found",
+                retryable=False,
+                status_code=404,
+            )
+
+        items = self.db.scalars(
+            select(WatchlistItem)
+            .where(WatchlistItem.user_id == user_id)
+            .order_by(WatchlistItem.added_at.desc())
+        ).all()
+
+        return [
+            WatchlistItemResponse(
+                userId=item.user_id,
+                movieId=item.movie_id,
+                addedAt=item.added_at,
+                notes=item.notes,
+                priority=item.priority,
+            )
+            for item in items
+        ]
 
     def remove_item(self, user_id: str, movie_id: str) -> RemoveWatchlistResponse:
         item = self.db.get(WatchlistItem, (user_id, movie_id))

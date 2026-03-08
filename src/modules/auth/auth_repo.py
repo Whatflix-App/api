@@ -22,6 +22,7 @@ class AuthRepo:
         user_id: str,
         email: str | None,
         display_name: str | None,
+        full_name: str | None,
         apple_sub: str,
         created_at: datetime,
     ) -> User:
@@ -29,6 +30,7 @@ class AuthRepo:
             id=user_id,
             email=email,
             display_name=display_name,
+            full_name=full_name,
             apple_sub=apple_sub,
             created_at=created_at,
         )

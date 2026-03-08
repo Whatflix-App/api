@@ -5,6 +5,7 @@ class ProfileResponse(BaseModel):
     id: str
     email: str | None = None
     displayName: str | None = None
+    fullName: str | None = None
 
 
 class UpdateProfileRequest(BaseModel):

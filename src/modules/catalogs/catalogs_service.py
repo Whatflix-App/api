@@ -52,6 +52,7 @@ class CatalogsService:
             name=catalog.name,
             description=catalog.description,
             isPublic=catalog.is_public,
+            movieIds=[],
             createdAt=catalog.created_at,
             updatedAt=catalog.updated_at,
         )
@@ -63,6 +64,17 @@ class CatalogsService:
             .order_by(Catalog.updated_at.desc())
         ).all()
 
+        catalog_ids = [catalog.id for catalog in catalogs]
+        movies_by_catalog: dict[str, list[str]] = {catalog_id: [] for catalog_id in catalog_ids}
+        if catalog_ids:
+            rows = self.db.execute(
+                select(CatalogItem.catalog_id, CatalogItem.movie_id).where(
+                    CatalogItem.catalog_id.in_(catalog_ids)
+                )
+            ).all()
+            for catalog_id, movie_id in rows:
+                movies_by_catalog[catalog_id].append(movie_id)
+
         return [
             CatalogResponse(
                 id=catalog.id,
@@ -70,6 +82,7 @@ class CatalogsService:
                 name=catalog.name,
                 description=catalog.description,
                 isPublic=catalog.is_public,
+                movieIds=movies_by_catalog.get(catalog.id, []),
                 createdAt=catalog.created_at,
                 updatedAt=catalog.updated_at,
             )

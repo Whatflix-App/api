@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     jwt_secret: str = "replace-me"
     access_token_ttl_minutes: int = 15
     refresh_token_ttl_days: int = 30
+    tmdb_api_key: str | None = None
+    tmdb_bearer: str | None = None
+    tmdb_base_url: str = "https://api.themoviedb.org/3"
+    tmdb_timeout_seconds: float = 5.0
 
 
 settings = Settings()

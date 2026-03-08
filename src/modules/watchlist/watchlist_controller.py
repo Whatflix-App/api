@@ -13,6 +13,15 @@ from src.modules.watchlist.watchlist_types import (
 router = APIRouter(prefix="/watchlist", tags=["watchlist"])
 
 
+@router.get("", response_model=list[WatchlistItemResponse])
+def list_watchlist_items(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+) -> list[WatchlistItemResponse]:
+    service = WatchlistService(db)
+    return service.list_items(user_id)
+
+
 @router.post("", response_model=WatchlistItemResponse)
 def add_watchlist_item(
     payload: AddWatchlistRequest,

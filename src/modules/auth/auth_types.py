@@ -14,6 +14,7 @@ class AppleLoginRequest(BaseModel):
     provider: Literal["apple"]
     identityToken: str = Field(min_length=1)
     authorizationCode: str = Field(min_length=1)
+    fullName: str | None = Field(default=None, max_length=120)
     device: DevicePayload
 
 
