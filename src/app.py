@@ -27,6 +27,6 @@ def create_app() -> FastAPI:
         Example:
             /health {}
         """
-        return {"ok": True}
+        return {"ok, yay": True}
 
     return app
